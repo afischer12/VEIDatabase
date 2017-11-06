@@ -14,7 +14,6 @@ public class Forms extends JFrame implements ActionListener{
 	JTextField pNameField;
 	JButton createProduct;
 	Forms guide;
-	int eEnc=0;
 	Forms(String formType){
 		if(formType.equals("entry")) {
 			addNewEntry();
@@ -101,7 +100,7 @@ public class Forms extends JFrame implements ActionListener{
 			JFrame frame=new JFrame();
 			int n=JOptionPane.showOptionDialog(frame, "Are you sure you want to create the product "+pNameField.getText()+" with the inputted data?", "Confimation Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null,null,null);
 			if(n==0) {
-				try(PrintStream out=new PrintStream("C:\\Users\\aidan\\desktop\\"+pNameField.getText()+".txt",encoding)){
+				try(PrintStream out=new PrintStream("Z:\\"+pNameField.getText()+".txt",encoding)){
 					Matcher match = reg1.matcher(dataFields.getText());
 					int arraySize=0;
 					String backup = dataFields.getText();
@@ -143,20 +142,17 @@ public class Forms extends JFrame implements ActionListener{
 					}while(match.find());
 					try {
 						EditDatabase.addLine("Test", data[0], data[1]);
-					} catch (ClassNotFoundException e1) {
-						e1.printStackTrace();
-					} catch (SQLException e1) {
-						System.err.println("Database File not found");
 					} catch (Exception e1) {
-						e1.printStackTrace();
-					} catch (Throwable e1) {
-						e1.printStackTrace();
+						if(e1 instanceof FileNotFoundException) {
+							System.err.println("Database File not found");
+						}
 					}
 					dispose();
 				} catch (FileNotFoundException e1) {
 					System.out.println("The system cannot find the drive where it stores the product data. Make sure the computer that hosts the drive is booted and make sure the folder where the database is is mapped as a network drive with the drive letter Z:.");
 				} catch (UnsupportedEncodingException e1) {
-					System.out.println("Use another encoding. You should not see this error, however if you do, simply hit ok and you should be fine.");
+					
+					System.out.println("Encoding error. You should not see this error, however if you do, simply hit ok and you should be fine.");
 				}
 			}
 		}

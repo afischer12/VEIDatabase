@@ -1,16 +1,22 @@
 import java.io.FileNotFoundException;
 import java.sql.*;
-
 import net.ucanaccess.jdbc.UcanaccessSQLException;
+
 @SuppressWarnings("serial")
 public class EditDatabase extends NewEntryForm{
 
-	public static int addLine(String tableName, String[] columns, String[] entries) throws SQLException, ClassNotFoundException{
+	public static int addLine(String tableName, String[] columns, String[] entries) throws Exception{
 		int exitStatus=0;
 		String columnNames="";
 		String entryNames="";
 		for(int counter=0;counter<columns.length;counter++) {
 			columnNames+=columns[counter]+",";
+			if(counter==0&&SQLQuery("SELECT * FROM "+tableName).getMetaData().getColumnCount()==1) {
+				SQLUpdate("ALTER TABLE "+tableName+" DROP PRIMARY KEY");
+				SQLUpdate("ALTER TABLE "+tableName+" ADD COLUMN "+columns[counter]+" TEXT(64) NOT NULL ");
+			}else {
+				SQLUpdate("ALTER TABLE "+tableName+" ADD COLUMN "+columns[counter]+" TEXT(64)");
+			}
 			entryNames+=entries[counter]+",";
 		}
 		columnNames=columnNames.substring(0, columnNames.length()-1);
@@ -58,7 +64,7 @@ public class EditDatabase extends NewEntryForm{
 		return result;
 	}
 
-	public static void createTableIfNotExist(String tableName) throws Throwable{
+	public static void createTableIfNotExist(String tableName){
 		try {
 			ResultSet getExist = SQLQuery("SELECT MSysObjects.*, MSysObjects.Type FROM MSysObjects WHERE (((MSysObjects.Type)=1)) OR (((MSysObjects.Type)=6))");
 			ResultSetMetaData rmsd = getExist.getMetaData();
